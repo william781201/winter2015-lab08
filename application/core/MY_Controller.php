@@ -31,13 +31,41 @@ class Application extends CI_Controller {
      * Render this page
      */
     function render() {
-        $this->data['menubar'] = $this->parser->parse('_menubar', $this->config->item('menu_choices'),true);
+        $this->data['menubar'] = $this->parser->parse('_menubar', $this->makemenu(),true);
         $this->data['content'] = $this->parser->parse($this->data['pagebody'], $this->data, true);
-
-        // finally, build the browser page!
-        $this->data['data'] = &$this->data;
         $this->data['sessionid'] = session_id();
+        
+        // finally, build the browser page!
+        $this->data['data'] = &$this->data;        
         $this->parser->parse('_template', $this->data);
+    }
+    
+    function makemenu()
+    {
+        $userRole = $this->session->userdata('userRole');
+        //add menu depending on what authorization the user has
+        $this->menu = array( array('name' => "Alpha", 'link' => '/alpha') );
+        
+        if ($userRole == ROLE_USER || $userRole == ROLE_ADMIN ) {
+            array_push($this->menu, array('name' => "Beta", 'link' => '/beta') );
+        }
+            
+        if ($userRole == ROLE_ADMIN ) {
+            array_push($this->menu, array('name' => "Gamma", 'link' => '/gamma') );
+        }            
+        
+        //add menu depending on if the user is logged in or not
+        if ($userRole == null) {
+            array_push($this->menu, array('name' => "Login", 'link' => '/auth') );
+        }
+            
+        if ($userRole != null) {
+            array_push($this->menu, array('name' => "Logout", 'link' => '/auth/logout') );
+        }            
+        
+        //return the menu array to the render function
+        $this->something = array('menudata' => $this->menu);
+        return $this->something;
     }
 
     function restrict($roleNeeded = null) {
