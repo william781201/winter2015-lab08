@@ -131,9 +131,13 @@ class MY_Model extends CI_Model implements Active_Record {
         parent::__construct();
 
         if ($tablename == null)
+        {
             $this->_tableName = get_class($this);
+        }            
         else
+        {
             $this->_tableName = $tablename;
+        }            
 
         $this->_keyField = $keyfield;
     }
@@ -169,7 +173,9 @@ class MY_Model extends CI_Model implements Active_Record {
         $names = $this->db->list_fields($this->_tableName);
         $object = new StdClass;
         foreach ($names as $name)
+        {
             $object->$name = "";
+        }            
         return $object;
     }
 
@@ -191,7 +197,9 @@ class MY_Model extends CI_Model implements Active_Record {
         $this->db->where($this->_keyField, $key);
         $query = $this->db->get($this->_tableName);
         if ($query->num_rows() < 1)
+        {
             return null;
+        }            
         return $query->row();
     }
 
@@ -220,7 +228,9 @@ class MY_Model extends CI_Model implements Active_Record {
         $this->db->where($this->_keyField, $key);
         $query = $this->db->get($this->_tableName);
         if ($query->num_rows() < 1)
+        {
             return false;
+        }            
         return true;
     }
 
@@ -247,7 +257,9 @@ class MY_Model extends CI_Model implements Active_Record {
         if (($what == 'period') && ($which < 9)) {
             $this->db->where($what, $which); // special treatment for period
         } else
+        {
             $this->db->where($what, $which);
+        }            
         $query = $this->db->get($this->_tableName);
         return $query->result();
     }
@@ -259,9 +271,13 @@ class MY_Model extends CI_Model implements Active_Record {
         $query = $this->db->get($this->_tableName);
         $result = $query->result();
         if (count($result) > 0)
+        {
             return $result[0]->$key;
+        }            
         else
+        {
             return null;
+        }            
     }
 
 }
