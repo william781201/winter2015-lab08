@@ -31,41 +31,37 @@ class Application extends CI_Controller {
      * Render this page
      */
     function render() {
-        $this->data['menubar'] = $this->parser->parse('_menubar', $this->makemenu(),true);
+        $menuinfo = array('menudata' => $this->makemenu());
+        $this->data['menubar'] = $this->parser->parse('_menubar', $menuinfo, true);
         $this->data['content'] = $this->parser->parse($this->data['pagebody'], $this->data, true);
-        $this->data['sessionid'] = session_id();
         
         // finally, build the browser page!
-        $this->data['data'] = &$this->data;        
+        $this->data['data'] = &$this->data;
+        $this->data['sessionid'] = session_id();
         $this->parser->parse('_template', $this->data);
     }
     
-    function makemenu()
-    {
-        $userRole = $this->session->userdata('userRole');
-        //add menu depending on what authorization the user has
-        $this->menu = array( array('name' => "Alpha", 'link' => '/alpha') );
-        
-        if ($userRole == ROLE_USER || $userRole == ROLE_ADMIN ) {
-            array_push($this->menu, array('name' => "Beta", 'link' => '/beta') );
-        }
-            
-        if ($userRole == ROLE_ADMIN ) {
-            array_push($this->menu, array('name' => "Gamma", 'link' => '/gamma') );
-        }            
-        
-        //add menu depending on if the user is logged in or not
-        if ($userRole == null) {
-            array_push($this->menu, array('name' => "Login", 'link' => '/auth') );
-        }
-            
-        if ($userRole != null) {
-            array_push($this->menu, array('name' => "Logout", 'link' => '/auth/logout') );
-        }            
-        
-        //return the menu array to the render function
-        $this->something = array('menudata' => $this->menu);
-        return $this->something;
+    function makemenu() {
+        // Get role and name from session
+        $name = $this->session->userdata('userName');
+        $role = $this->session->userdata('userRole');        
+        if (strcmp($role, "admin") == 0) {
+            $menu = array(
+                    array('name' => "Alpha", 'link' => '/alpha'),
+                    array('name' => "Beta", 'link' => '/beta'),
+                    array('name' => "Gamma", 'link' => '/gamma'),
+                    array('name' => "Logout", 'link' => '/auth/logout'), );
+        }else if (strcmp($role, "user") == 0) {
+            $menu = array(
+                    array('name' => "Alpha", 'link' => '/alpha'),
+                    array('name' => "Beta", 'link' => '/beta'),
+                    array('name' => "Logout", 'link' => '/auth/logout'), );
+        }else {
+            $menu = array(
+                    array('name' => "Alpha", 'link' => '/alpha'),
+                    array('name' => "Login", 'link' => '/auth'), );
+        }                
+        return $menu;
     }
 
     function restrict($roleNeeded = null) {
